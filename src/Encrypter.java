@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Encrypter {
@@ -26,39 +28,55 @@ public class Encrypter {
     }
 
     /**
-     * Encrypts the content of a file and writes the result to another file.
-     *
-     * @param inputFilePath      the path to the file containing the text to be encrypted
-     * @param encryptedFilePath the path to the file where the encrypted text will be written
+     * This both encrypts and decrypts files based on the shift used. It checks to see if a character is a letter 
+     * and if it is, it shifts it by the shift value.
      * @throws Exception if an error occurs while reading or writing the files
+     * @param inputFilePath where the data is read from
+     * @param outputFilePath where the shifted data is written
      */
-    public void encrypt(String inputFilePath, String encryptedFilePath) throws Exception {
+    public void caesarCipher(String inputFilePath, String outputFilePath) throws Exception {
         //TODO: Call the read method, encrypt the file contents, and then write to new file
+    	String data=FileReader.readFile(inputFilePath);
+    	String result="";
+    	for(int i=0;i<data.length();i++) {
+        	char character=data.charAt(i);
+        	if(Character.isLetter(character)) {
+        	char c=(char)(data.charAt(i)+shift);
+        	 if (Character.isLowerCase(data.charAt(i)) && c < 'a') {
+                 result += (char) (data.charAt(i) + (26 + shift));
+             } else if (Character.isUpperCase(data.charAt(i)) && c < 'A') {
+                 result += (char) (data.charAt(i) + (26 + shift));
+             } else {
+                 result += c;
+             }
+        }else result+=character;
     }
+    	FileReader.writeFile(result, outputFilePath);
+}
 
-    /**
-     * Decrypts the content of an encrypted file and writes the result to another file.
-     *
-     * @param messageFilePath    the path to the file containing the encrypted text
-     * @param decryptedFilePath the path to the file where the decrypted text will be written
-     * @throws Exception if an error occurs while reading or writing the files
-     */
-    public void decrypt(String messageFilePath, String decryptedFilePath) throws Exception {
-        //TODO: Call the read method, decrypt the file contents, and then write to new file
-    }
 
-    /**
-     * Reads the content of a file and returns it as a string.
-     *
-     * @param filePath the path to the file to be read
-     * @return the content of the file as a string
-     * @throws Exception if an error occurs while reading the file
-     */
-    private static String readFile(String filePath) throws Exception {
-        String message = "";
-        //TODO: Read file from filePath
-        return message;
-    }
+    public class FileReader {
+
+    	 /**
+         * Reads data from a file.
+         *
+         * @param fileName the path to the file where the data will be read from.
+         */
+    	
+    	
+        private static String readFile(String fileName) throws Exception {
+            String message = "";
+
+            try (Scanner fileScanner = new Scanner(Paths.get(fileName))) {
+                while (fileScanner.hasNextLine()) {
+                    String line = fileScanner.nextLine();
+                    message += line;
+                } fileScanner.close();
+            } catch (Exception e) {
+                System.out.println("Error: " + e.toString());}
+
+            return message;
+        }
 
     /**
      * Writes data to a file.
@@ -68,6 +86,13 @@ public class Encrypter {
      */
     private static void writeFile(String data, String filePath) {
         //TODO: Write to filePath
+    	
+    	try(PrintWriter output=new PrintWriter(filePath)){
+    		output.print(data);
+    		output.close();
+    	}catch(Exception e) {
+    		System.out.println("Error: "+ e.toString());
+    	}
     }
 
     /**
@@ -79,4 +104,4 @@ public class Encrypter {
     public String toString() {
         return encrypted;
     }
-}
+}}
